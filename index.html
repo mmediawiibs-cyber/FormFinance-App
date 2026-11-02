@@ -778,47 +778,60 @@ function doGet(e) {
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         // URL Google Apps Script Default (Terhubung langsung ke Deployment Web App Form Finance STIT)
-        let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwDvfjYhsPbbObwRQkJBxHJPo854ZRzLLYQoRAIKc9OwrpqbXKVnrR_dpd3e9WpZ9K/exec";
+        let SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyA98ZrWNSCZmlT48IWtEk0Gi52cImMlshMo5LdhG83yUQAtyTL4oVLunM_OKhCBrEN/exec";
 
         // Database Relasi Otomatis Pilihan Nomor 11 (Kepada) -> Nomor 12, 13, 14, 15
-        const DB_PENERIMA = {
-            "Ustadz Afghani": {
-                sebagai: "Kabag Media",
-                anPenerima: "AFGHANI",
-                bank: "BSI",
-                noRekening: "7147151588"
-            },
-            "Salwa Nurshalihah": {
-                sebagai: "Staff Media Development",
-                anPenerima: "SALWA NURSHALIHAH",
-                bank: "BSI",
-                noRekening: "7218899001"
-            },
-            "Dr. Ahmad Fauzi, M.Pd.": {
-                sebagai: "Kaprodi MPI",
-                anPenerima: "AHMAD FAUZI",
-                bank: "Bank Mandiri",
-                noRekening: "1370098765432"
-            },
-            "Budi Santoso, S.Kom.": {
-                sebagai: "Kepala Divisi IT",
-                anPenerima: "BUDI SANTOSO",
-                bank: "BCA",
-                noRekening: "8420991122"
-            },
-            "Siti Aminah, M.E.": {
-                sebagai: "Kepala BAAU",
-                anPenerima: "SITI AMINAH",
-                bank: "BRI",
-                noRekening: "002901002345501"
-            },
-            "Toko Berkah Jaya": {
-                sebagai: "Vendor Peralatan & Percetakan",
-                anPenerima: "CV BERKAH JAYA UTAMA",
-                bank: "BCA",
-                noRekening: "4561122334"
+        let DB_PENERIMA = {};
+
+        function renderVendorOptions(vendors) {
+            const select = document.getElementById('kepada');
+            if (!select) return;
+
+            const selectedValue = select.value;
+            select.innerHTML = '<option value="">-- Pilih Nama Penerima Pembayaran --</option>' + vendors.map(vendor => {
+                return `<option value="${vendor.nama}">${vendor.nama} (${vendor.sebagai})</option>`;
+            }).join('');
+
+            if (selectedValue) {
+                select.value = selectedValue;
             }
-        };
+        }
+
+        async function loadVendorOptions() {
+            const select = document.getElementById('kepada');
+            if (!select) return;
+
+            DB_PENERIMA = {};
+            const fallback = [
+                { nama: 'Ustadz Afghani', sebagai: 'Kabag Media', anPenerima: 'AFGHANI', bank: 'BSI', noRekening: '7147151588' },
+                { nama: 'Salwa Nurshalihah', sebagai: 'Staff Media Development', anPenerima: 'SALWA NURSHALIHAH', bank: 'BSI', noRekening: '7218899001' },
+                { nama: 'Dr. Ahmad Fauzi, M.Pd.', sebagai: 'Kaprodi MPI', anPenerima: 'AHMAD FAUZI', bank: 'Bank Mandiri', noRekening: '1370098765432' },
+                { nama: 'Budi Santoso, S.Kom.', sebagai: 'Kepala Divisi IT', anPenerima: 'BUDI SANTOSO', bank: 'BCA', noRekening: '8420991122' },
+                { nama: 'Siti Aminah, M.E.', sebagai: 'Kepala BAAU', anPenerima: 'SITI AMINAH', bank: 'BRI', noRekening: '002901002345501' },
+                { nama: 'Toko Berkah Jaya', sebagai: 'Vendor Peralatan & Percetakan', anPenerima: 'CV BERKAH JAYA UTAMA', bank: 'BCA', noRekening: '4561122334' }
+            ];
+
+            try {
+                if (SCRIPT_URL && SCRIPT_URL.startsWith('https://script.google.com')) {
+                    const res = await fetch(`${SCRIPT_URL}?action=getVendors`);
+                    const vendors = await res.json();
+                    if (Array.isArray(vendors) && vendors.length > 0) {
+                        vendors.forEach(v => {
+                            DB_PENERIMA[v.nama] = v;
+                        });
+                        renderVendorOptions(vendors.map(v => ({ nama: v.nama, sebagai: v.sebagai })));
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Gagal memuat vendor dari sheet, memakai data lokal fallback.', e);
+            }
+
+            fallback.forEach(v => {
+                DB_PENERIMA[v.nama] = v;
+            });
+            renderVendorOptions(fallback.map(v => ({ nama: v.nama, sebagai: v.sebagai })));
+        }
 
         // Data Awal sesuai Contoh Riil Spreadsheet "Form Finance STIT" (23 Kolom)
         let dataPPList = [
@@ -1471,6 +1484,7 @@ function doGet(e) {
         window.onload = function() {
             initDefaultDates();
             updateLiveNomorPP();
+            loadVendorOptions();
             renderTable();
             syncFromGoogleSheets();
         };

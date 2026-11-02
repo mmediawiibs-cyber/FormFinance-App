@@ -28,10 +28,93 @@ function getSheetOrCreate(sheetName) {
   return sheet;
 }
 
+function ensureVendorSeedData() {
+  var sheet = getSheetOrCreate("Data Vendor");
+  var values = sheet.getDataRange().getValues();
+  if (values.length <= 1) {
+    sheet.appendRow([
+      "Nama Penerima",
+      "Sebagai",
+      "A/N Penerima",
+      "Bank",
+      "No Rekening",
+    ]);
+    sheet.appendRow([
+      "Ustadz Afghani",
+      "Kabag Media",
+      "AFGHANI",
+      "BSI",
+      "7147151588",
+    ]);
+    sheet.appendRow([
+      "Salwa Nurshalihah",
+      "Staff Media Development",
+      "SALWA NURSHALIHAH",
+      "BSI",
+      "7218899001",
+    ]);
+    sheet.appendRow([
+      "Dr. Ahmad Fauzi, M.Pd.",
+      "Kaprodi MPI",
+      "AHMAD FAUZI",
+      "Bank Mandiri",
+      "1370098765432",
+    ]);
+    sheet.appendRow([
+      "Budi Santoso, S.Kom.",
+      "Kepala Divisi IT",
+      "BUDI SANTOSO",
+      "BCA",
+      "8420991122",
+    ]);
+    sheet.appendRow([
+      "Siti Aminah, M.E.",
+      "Kepala BAAU",
+      "SITI AMINAH",
+      "BRI",
+      "002901002345501",
+    ]);
+    sheet.appendRow([
+      "Toko Berkah Jaya",
+      "Vendor Peralatan & Percetakan",
+      "CV BERKAH JAYA UTAMA",
+      "BCA",
+      "4561122334",
+    ]);
+  }
+  return sheet;
+}
+
 function normalizeNominal(rawValue) {
   var raw = String(rawValue == null ? "0" : rawValue);
   var cleaned = raw.replace(/[^0-9]/g, "");
   return cleaned === "" ? 0 : Number(cleaned);
+}
+
+function vendorRowData(data) {
+  return [
+    data.nama || "",
+    data.sebagai || "",
+    data.anPenerima || "",
+    data.bank || "",
+    data.noRekening || "",
+  ];
+}
+
+function findVendorRowIndexByName(sheet, nama) {
+  if (!sheet || !nama) return -1;
+  var rows = sheet.getDataRange().getValues();
+  var target = String(nama).trim().toLowerCase();
+  for (var i = 1; i < rows.length; i++) {
+    if (
+      String(rows[i][0] || "")
+        .trim()
+        .toLowerCase() === target
+    ) {
+      return i + 1;
+    }
+  }
+  return -1;
 }
 
 function findRowIndexByNomor(sheet, nomor) {
@@ -162,6 +245,78 @@ function doPost(e) {
       ).setMimeType(ContentService.MimeType.JSON);
     }
 
+    if (data.action === "saveVendor") {
+      var vendorSheet = ensureVendorSeedData();
+      var vendorName = String(data.nama || "").trim();
+      if (!vendorName) {
+        return ContentService.createTextOutput(
+          JSON.stringify({
+            status: "error",
+            message: "Nama vendor wajib diisi.",
+          }),
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      if (findVendorRowIndexByName(vendorSheet, vendorName) > -1) {
+        return ContentService.createTextOutput(
+          JSON.stringify({
+            status: "error",
+            message: "Nama vendor sudah ada.",
+          }),
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      vendorSheet.appendRow(vendorRowData(data));
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          status: "success",
+          message: "Vendor baru berhasil ditambahkan.",
+        }),
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (data.action === "updateVendor") {
+      var vendorSheet = ensureVendorSeedData();
+      var originalName = String(data.originalNama || data.nama || "").trim();
+      var rowIndex = findVendorRowIndexByName(vendorSheet, originalName);
+      if (rowIndex === -1) {
+        rowIndex = findVendorRowIndexByName(vendorSheet, data.nama || "");
+      }
+      if (rowIndex === -1) {
+        return ContentService.createTextOutput(
+          JSON.stringify({
+            status: "error",
+            message: "Vendor yang diedit tidak ditemukan.",
+          }),
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      vendorSheet.getRange(rowIndex, 1, 1, 5).setValues([vendorRowData(data)]);
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          status: "success",
+          message: "Vendor berhasil diperbarui.",
+        }),
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (data.action === "deleteVendor") {
+      var vendorSheet = ensureVendorSeedData();
+      var rowIndex = findVendorRowIndexByName(vendorSheet, data.nama || "");
+      if (rowIndex === -1) {
+        return ContentService.createTextOutput(
+          JSON.stringify({
+            status: "error",
+            message: "Vendor tidak ditemukan.",
+          }),
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      vendorSheet.deleteRow(rowIndex);
+      return ContentService.createTextOutput(
+        JSON.stringify({
+          status: "success",
+          message: "Vendor berhasil dihapus.",
+        }),
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var lastRow = sheetA.getLastRow();
     var nomorUrut = 1;
     if (lastRow > 1) {
@@ -248,6 +403,26 @@ function doGet(e) {
       }
     }
     return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(
+      ContentService.MimeType.JSON,
+    );
+  }
+
+  if (action === "getVendors") {
+    var vendorSheet = ensureVendorSeedData();
+    var vendorRows = vendorSheet.getDataRange().getValues();
+    var vendors = [];
+    for (var i = 1; i < vendorRows.length; i++) {
+      if (vendorRows[i][0] && String(vendorRows[i][0]).trim() !== "") {
+        vendors.push({
+          nama: vendorRows[i][0] || "",
+          sebagai: vendorRows[i][1] || "",
+          anPenerima: vendorRows[i][2] || "",
+          bank: vendorRows[i][3] || "",
+          noRekening: vendorRows[i][4] || "",
+        });
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(vendors)).setMimeType(
       ContentService.MimeType.JSON,
     );
   }

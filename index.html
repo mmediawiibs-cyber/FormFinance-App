@@ -973,6 +973,12 @@ function doGet(e) {
             return Number(String(str).replace(/[^0-9]/g, "")) || 0;
         }
 
+        function normalizeNominalForSave(value) {
+            const digitsOnly = String(value ?? "").replace(/[^\d]/g, "");
+            if (!digitsOnly) return "0";
+            return String(Number(digitsOnly));
+        }
+
         function numberToRupiah(num) {
             return Number(num || 0).toLocaleString('id-ID');
         }
@@ -1053,6 +1059,8 @@ function doGet(e) {
                 }
             }
 
+            const nominalBaru = normalizeNominalForSave(document.getElementById('nominal').value);
+
             const newEntry = {
                 nomor: nomorBaru,
                 divisi: document.getElementById('divisi').value,
@@ -1069,7 +1077,7 @@ function doGet(e) {
                 anPenerima: document.getElementById('anPenerima').value,
                 bank: document.getElementById('bank').value,
                 noRekening: document.getElementById('noRekening').value,
-                nominal: document.getElementById('nominal').value,
+                nominal: nominalBaru,
                 lampiran: infoLampiran,
                 fileLampiran: filePayload,
                 tanggalEntry: today,
@@ -1312,12 +1320,15 @@ function doGet(e) {
             const idx = dataPPList.findIndex(d => Number(d.nomor) === nomor);
             if (idx === -1) return;
 
+            const nominalBaru = normalizeNominalForSave(document.getElementById('edit_nominal').value);
+            const jumlahTfBaru = normalizeNominalForSave(document.getElementById('edit_jumlahTf').value);
+
             dataPPList[idx].uraian1 = document.getElementById('edit_uraian1').value;
-            dataPPList[idx].nominal = document.getElementById('edit_nominal').value;
+            dataPPList[idx].nominal = nominalBaru;
             dataPPList[idx].tanggalEntry = document.getElementById('edit_tanggalEntry').value;
             dataPPList[idx].status = document.getElementById('edit_status').value;
             dataPPList[idx].tanggalTf = document.getElementById('edit_tanggalTf').value;
-            dataPPList[idx].jumlahTf = document.getElementById('edit_jumlahTf').value;
+            dataPPList[idx].jumlahTf = jumlahTfBaru;
             dataPPList[idx].tanggalRekap = document.getElementById('edit_tanggalRekap').value;
             dataPPList[idx].keterangan = document.getElementById('edit_keterangan').value;
 
@@ -1325,6 +1336,7 @@ function doGet(e) {
                 fetch(SCRIPT_URL, {
                     method: "POST",
                     mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "updateData", ...dataPPList[idx] })
                 });
             }
@@ -1404,10 +1416,34 @@ function doGet(e) {
                 const res = await fetch(`${SCRIPT_URL}?action=getAllData`);
                 const rows = await res.json();
                 if (Array.isArray(rows) && rows.length > 0) {
-                    dataPPList = rows;
+                    dataPPList = rows.map(row => ({
+                        nomor: Number(row.nomor ?? row.NO ?? 0),
+                        divisi: row.divisi ?? "",
+                        nomorPp: row.nomorPp ?? "",
+                        namaPembuat: row.namaPembuat ?? row.pembuat ?? row.nama ?? "",
+                        tanggalPp: row.tanggalPp ?? row.tglPp ?? "",
+                        tanggalPemenuhan: row.tanggalPemenuhan ?? row.tglPemenuhan ?? "",
+                        tujuan: row.tujuan ?? "",
+                        uraian1: row.uraian1 ?? row.uraian ?? "",
+                        uraian2: row.uraian2 ?? "",
+                        uraian3: row.uraian3 ?? "",
+                        kepada: row.kepada ?? "",
+                        sebagai: row.sebagai ?? "",
+                        anPenerima: row.anPenerima ?? "",
+                        bank: row.bank ?? "",
+                        noRekening: row.noRekening ?? "",
+                        nominal: row.nominal ?? 0,
+                        lampiran: row.lampiran ?? "-",
+                        tanggalEntry: row.tanggalEntry ?? "",
+                        status: row.status ?? "NOT PAID",
+                        tanggalTf: row.tanggalTf ?? "",
+                        jumlahTf: row.jumlahTf ?? "",
+                        tanggalRekap: row.tanggalRekap ?? "",
+                        keterangan: row.keterangan ?? ""
+                    }));
                     renderTable();
                     updateLiveNomorPP();
-                    showToast(`Berhasil memuat ${rows.length} baris dari Sheet Data PP!`);
+                    showToast(`Berhasil memuat ${dataPPList.length} baris dari Sheet Data PP!`);
                 }
             } catch (e) {
                 renderTable();

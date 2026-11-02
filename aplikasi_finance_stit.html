@@ -1404,10 +1404,34 @@ function doGet(e) {
                 const res = await fetch(`${SCRIPT_URL}?action=getAllData`);
                 const rows = await res.json();
                 if (Array.isArray(rows) && rows.length > 0) {
-                    dataPPList = rows;
+                    dataPPList = rows.map(row => ({
+                        nomor: Number(row.nomor ?? row.NO ?? 0),
+                        divisi: row.divisi ?? "",
+                        nomorPp: row.nomorPp ?? "",
+                        namaPembuat: row.namaPembuat ?? row.pembuat ?? row.nama ?? "",
+                        tanggalPp: row.tanggalPp ?? row.tglPp ?? "",
+                        tanggalPemenuhan: row.tanggalPemenuhan ?? row.tglPemenuhan ?? "",
+                        tujuan: row.tujuan ?? "",
+                        uraian1: row.uraian1 ?? row.uraian ?? "",
+                        uraian2: row.uraian2 ?? "",
+                        uraian3: row.uraian3 ?? "",
+                        kepada: row.kepada ?? "",
+                        sebagai: row.sebagai ?? "",
+                        anPenerima: row.anPenerima ?? "",
+                        bank: row.bank ?? "",
+                        noRekening: row.noRekening ?? "",
+                        nominal: row.nominal ?? 0,
+                        lampiran: row.lampiran ?? "-",
+                        tanggalEntry: row.tanggalEntry ?? "",
+                        status: row.status ?? "NOT PAID",
+                        tanggalTf: row.tanggalTf ?? "",
+                        jumlahTf: row.jumlahTf ?? "",
+                        tanggalRekap: row.tanggalRekap ?? "",
+                        keterangan: row.keterangan ?? ""
+                    }));
                     renderTable();
                     updateLiveNomorPP();
-                    showToast(`Berhasil memuat ${rows.length} baris dari Sheet Data PP!`);
+                    showToast(`Berhasil memuat ${dataPPList.length} baris dari Sheet Data PP!`);
                 }
             } catch (e) {
                 renderTable();

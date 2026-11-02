@@ -29,58 +29,36 @@ function getSheetOrCreate(sheetName) {
 }
 
 function ensureVendorSeedData() {
-  var sheet = getSheetOrCreate("Data Vendor");
+  var sheet = getSheetOrCreate("Vendor");
+  var expectedHeader = [
+    "NO",
+    "PENERIMA",
+    "SEBAGAI",
+    "A/N PENERIMA",
+    "BANK",
+    "NOMOR REKENING",
+  ];
   var values = sheet.getDataRange().getValues();
-  if (values.length <= 1) {
-    sheet.appendRow([
-      "Nama Penerima",
-      "Sebagai",
-      "A/N Penerima",
-      "Bank",
-      "No Rekening",
-    ]);
-    sheet.appendRow([
-      "Ustadz Afghani",
-      "Kabag Media",
-      "AFGHANI",
-      "BSI",
-      "7147151588",
-    ]);
-    sheet.appendRow([
-      "Salwa Nurshalihah",
-      "Staff Media Development",
-      "SALWA NURSHALIHAH",
-      "BSI",
-      "7218899001",
-    ]);
-    sheet.appendRow([
-      "Dr. Ahmad Fauzi, M.Pd.",
-      "Kaprodi MPI",
-      "AHMAD FAUZI",
-      "Bank Mandiri",
-      "1370098765432",
-    ]);
-    sheet.appendRow([
-      "Budi Santoso, S.Kom.",
-      "Kepala Divisi IT",
-      "BUDI SANTOSO",
-      "BCA",
-      "8420991122",
-    ]);
-    sheet.appendRow([
-      "Siti Aminah, M.E.",
-      "Kepala BAAU",
-      "SITI AMINAH",
-      "BRI",
-      "002901002345501",
-    ]);
-    sheet.appendRow([
-      "Toko Berkah Jaya",
-      "Vendor Peralatan & Percetakan",
-      "CV BERKAH JAYA UTAMA",
-      "BCA",
-      "4561122334",
-    ]);
+  if (!values.length || String(values[0][0] || "").trim() !== "NO") {
+    sheet.clear();
+    sheet.getRange(1, 1, 1, expectedHeader.length).setValues([expectedHeader]);
+  } else {
+    var currentHeader = [];
+    for (var i = 0; i < expectedHeader.length; i++) {
+      currentHeader.push(sheet.getRange(1, i + 1).getValue() || "");
+    }
+    if (
+      String(currentHeader[0]).trim() !== "NO" ||
+      String(currentHeader[1]).trim() !== "PENERIMA" ||
+      String(currentHeader[2]).trim() !== "SEBAGAI" ||
+      String(currentHeader[3]).trim() !== "A/N PENERIMA" ||
+      String(currentHeader[4]).trim() !== "BANK" ||
+      String(currentHeader[5]).trim() !== "NOMOR REKENING"
+    ) {
+      sheet
+        .getRange(1, 1, 1, expectedHeader.length)
+        .setValues([expectedHeader]);
+    }
   }
   return sheet;
 }
@@ -91,8 +69,26 @@ function normalizeNominal(rawValue) {
   return cleaned === "" ? 0 : Number(cleaned);
 }
 
-function vendorRowData(data) {
+function getVendorNextNo(sheet) {
+  if (!sheet) return 1;
+  var rows = sheet.getDataRange().getValues();
+  var maxNo = 0;
+  for (var i = 1; i < rows.length; i++) {
+    var val = Number(rows[i][0]);
+    if (!isNaN(val) && val > maxNo) {
+      maxNo = val;
+    }
+  }
+  return maxNo + 1;
+}
+
+function vendorRowData(data, nomorOverride) {
+  var noValue = Number(nomorOverride);
+  if (isNaN(noValue)) {
+    noValue = 1;
+  }
   return [
+    noValue,
     data.nama || "",
     data.sebagai || "",
     data.anPenerima || "",
@@ -107,7 +103,7 @@ function findVendorRowIndexByName(sheet, nama) {
   var target = String(nama).trim().toLowerCase();
   for (var i = 1; i < rows.length; i++) {
     if (
-      String(rows[i][0] || "")
+      String(rows[i][1] || "")
         .trim()
         .toLowerCase() === target
     ) {
@@ -264,7 +260,7 @@ function doPost(e) {
           }),
         ).setMimeType(ContentService.MimeType.JSON);
       }
-      vendorSheet.appendRow(vendorRowData(data));
+      vendorSheet.appendRow(vendorRowData(data, getVendorNextNo(vendorSheet)));
       return ContentService.createTextOutput(
         JSON.stringify({
           status: "success",
@@ -288,7 +284,20 @@ function doPost(e) {
           }),
         ).setMimeType(ContentService.MimeType.JSON);
       }
-      vendorSheet.getRange(rowIndex, 1, 1, 5).setValues([vendorRowData(data)]);
+      var currentNo =
+        Number(vendorSheet.getRange(rowIndex, 1).getValue()) || rowIndex;
+      vendorSheet
+        .getRange(rowIndex, 1, 1, 6)
+        .setValues([
+          [
+            currentNo,
+            data.nama || "",
+            data.sebagai || "",
+            data.anPenerima || "",
+            data.bank || "",
+            data.noRekening || "",
+          ],
+        ]);
       return ContentService.createTextOutput(
         JSON.stringify({
           status: "success",
@@ -412,13 +421,14 @@ function doGet(e) {
     var vendorRows = vendorSheet.getDataRange().getValues();
     var vendors = [];
     for (var i = 1; i < vendorRows.length; i++) {
-      if (vendorRows[i][0] && String(vendorRows[i][0]).trim() !== "") {
+      if (vendorRows[i][1] && String(vendorRows[i][1]).trim() !== "") {
         vendors.push({
-          nama: vendorRows[i][0] || "",
-          sebagai: vendorRows[i][1] || "",
-          anPenerima: vendorRows[i][2] || "",
-          bank: vendorRows[i][3] || "",
-          noRekening: vendorRows[i][4] || "",
+          no: Number(vendorRows[i][0]) || i,
+          nama: vendorRows[i][1] || "",
+          sebagai: vendorRows[i][2] || "",
+          anPenerima: vendorRows[i][3] || "",
+          bank: vendorRows[i][4] || "",
+          noRekening: vendorRows[i][5] || "",
         });
       }
     }

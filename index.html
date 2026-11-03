@@ -1628,14 +1628,26 @@ function doGet(e) {
                     body: JSON.stringify(payload)
                 });
 
+                let result = null;
+                try {
+                    result = await res.json();
+                } catch (jsonErr) {
+                    console.warn('Respons vendor bukan JSON:', jsonErr);
+                }
+
                 if (res.ok || res.type === 'opaque' || res.type === 'cors') {
                     resetVendorForm();
-                    await syncVendorList();
-                    await loadVendorOptions();
-                    showToast(action === 'updateVendor' ? 'Vendor berhasil diperbarui.' : 'Vendor baru berhasil ditambahkan.');
-                } else {
-                    showToast('Gagal menyimpan vendor.', true);
+                    try {
+                        await syncVendorList();
+                        await loadVendorOptions();
+                    } catch (syncErr) {
+                        console.warn('Sinkronisasi vendor gagal setelah simpan:', syncErr);
+                    }
+                    showToast((result && result.message) || (action === 'updateVendor' ? 'Vendor berhasil diperbarui.' : 'Vendor baru berhasil ditambahkan.'));
+                    return;
                 }
+
+                showToast((result && result.message) || 'Gagal menyimpan vendor.', true);
             } catch (err) {
                 console.error(err);
                 showToast('Gagal tersambung ke Apps Script vendor.', true);
@@ -1668,9 +1680,17 @@ function doGet(e) {
         async function syncVendorList() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getVendors`);
-                const list = await res.json();
+                const text = await res.text();
+                let list = [];
+                try {
+                    list = JSON.parse(text);
+                } catch (parseErr) {
+                    console.warn('Respons vendor bukan JSON valid:', parseErr);
+                    list = [];
+                }
                 vendorList = Array.isArray(list) ? list : [];
             } catch (e) {
+                console.warn('Gagal mengambil vendor dari Apps Script, memakai fallback lokal.', e);
                 vendorList = [
                     { nama: 'Ustadz Afghani', sebagai: 'Kabag Media', anPenerima: 'AFGHANI', bank: 'BSI', noRekening: '7147151588' },
                     { nama: 'Salwa Nurshalihah', sebagai: 'Staff Media Development', anPenerima: 'SALWA NURSHALIHAH', bank: 'BSI', noRekening: '7218899001' },

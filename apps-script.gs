@@ -419,7 +419,6 @@ function doGet(e) {
   if (action === "getVendors") {
     var vendorSheet = ensureVendorSeedData();
     var vendorRows = vendorSheet.getDataRange().getValues();
-    A;
     var vendors = [];
     for (var i = 1; i < vendorRows.length; i++) {
       if (vendorRows[i][1] && String(vendorRows[i][1]).trim() !== "") {

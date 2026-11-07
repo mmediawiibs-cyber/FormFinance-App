@@ -53,9 +53,7 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Finance STIT</h1>
-                        <span id="connBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>23 Kolom Ready
+                        <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">Finance STIT</h1>23 Kolom Ready
                         </span>
                     </div>
                     <p class="text-xs text-slate-500 font-medium">Sistem Informasi Permintaan Pembayaran & Cetak Form PP</p>
@@ -79,11 +77,6 @@
                             <span>3. Kelola Vendor</span>
                         </button>
                     </div>
-
-                    <button onclick="openSetupModal()" title="Pengaturan Integrasi Google Sheets & Kode Apps Script" class="p-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition shadow-sm flex items-center gap-2 text-xs font-bold">
-                    <i class="fa-solid fa-gear text-indigo-600 text-sm"></i>
-                    <span class="hidden md:inline">Koneksi & Code.gs</span>
-                </button>
             </div>
         </div>
     </header>
@@ -120,17 +113,6 @@
                 </div>
             </div>
 
-            <div class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-indigo-200 bg-indigo-50">
-                <div>
-                    <p class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600">Menu Kelola Data</p>
-                    <p class="text-sm font-semibold text-slate-700">Data vendor / penerima bisa dikelola dari menu khusus berikut.</p>
-                </div>
-                <button type="button" onclick="openVendorTab()" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-extrabold shadow-sm shadow-indigo-200 transition">
-                    <i class="fa-solid fa-user-tie"></i>
-                    <span>Kelola Vendor</span>
-                </button>
-            </div>
-
             <!-- Main Form Card -->
             <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl shadow-slate-200/40 p-6 sm:p-8">
                 <form id="formInputPP" onsubmit="handleFormSubmit(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -138,7 +120,7 @@
                     <!-- Kolom Kiri (7 Grid): Identitas, Tanggal & Uraian Kebutuhan -->
                     <div class="lg:col-span-7 space-y-5">
                         <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-                            <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-extrabold">1</div>
+                            <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-extrabold">1</div>
                             <h3 class="text-base font-extrabold text-slate-800">Identitas Divisi, Pembuat & Rincian Pengajuan</h3>
                         </div>
 
@@ -146,10 +128,10 @@
                             <!-- Kolom 2: Divisi (Dropdown) -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    2. Divisi (`PP`) <span class="text-red-500">*</span>
+                                    Divisi (`PP`) <span class="text-red-500">*</span>
                                 </label>
                                 <select id="divisi" onchange="updateLiveNomorPP()" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
-                                    <option value="MDU">MDU - Media Development University</option>
+                                    <option value="MD">MD - Media Development</option>
                                     <option value="P-MPI">P-MPI - Prodi Manajemen Pendidikan Islam</option>
                                     <option value="IT">IT - Information And Technology</option>
                                     <option value="LPM">LPM - Lembaga Penjamin Mutu</option>
@@ -164,17 +146,19 @@
                             <!-- Kolom 4: Nama Pembuat (Dropdown) -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    4. Nama Pembuat <span class="text-red-500">*</span>
+                                    Nama Pembuat <span class="text-red-500">*</span>
                                 </label>
-                                <select id="namaPembuat" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
-                                    <option value="">-- Pilih Nama Pembuat --</option>
-                                    <option value="Salwa Nurshalihah">Salwa Nurshalihah</option>
-                                    <option value="Ustadz Afghani">Ustadz Afghani</option>
-                                    <option value="Dr. Ahmad Fauzi, M.Pd.">Dr. Ahmad Fauzi, M.Pd.</option>
-                                    <option value="Budi Santoso, S.Kom.">Budi Santoso, S.Kom.</option>
-                                    <option value="Siti Aminah, M.E.">Siti Aminah, M.E.</option>
-                                    <option value="Rina Kartika, S.Pd.">Rina Kartika, S.Pd.</option>
+                                <select id="namaPembuat" onchange="toggleNamaPembuatCustom()" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 hover:bg-white focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
+                                    <option value="Muhamad Zacky Haidar">Muhamad Zacky Haidar</option>
+                                    <option value="__custom__">Tulis sendiri</option>
                                 </select>
+                                <input
+                                    type="text"
+                                    id="namaPembuatCustom"
+                                    placeholder="Tulis nama pembuat"
+                                    class="hidden mt-2 w-full border border-slate-200 rounded-2xl p-3.5 bg-white text-sm font-semibold focus:border-indigo-600 outline-none"
+                                    autocomplete="name"
+                                >
                             </div>
                         </div>
 
@@ -182,7 +166,7 @@
                             <!-- Kolom 5: Tanggal PP -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    5. Tanggal PP <span class="text-red-500">*</span>
+                                    Tanggal PP <span class="text-red-500">*</span>
                                 </label>
                                 <input type="date" id="tanggalPp" onchange="updateLiveNomorPP()" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
                             </div>
@@ -190,7 +174,7 @@
                             <!-- Kolom 6: Tanggal Pemenuhan -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    6. Tanggal Pemenuhan <span class="text-red-500">*</span>
+                                    Tanggal Pemenuhan <span class="text-red-500">*</span>
                                 </label>
                                 <input type="date" id="tanggalPemenuhan" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
                             </div>
@@ -198,7 +182,7 @@
                             <!-- Kolom 7: Tujuan -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    7. Tujuan <span class="text-red-500">*</span>
+                                    Tujuan <span class="text-red-500">*</span>
                                 </label>
                                 <select id="tujuan" required class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-semibold transition outline-none">
                                     <option value="Reimburse">Reimburse</option>
@@ -210,7 +194,7 @@
                         <!-- Kolom 8: Uraian I (Tujuan) -->
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                8. Uraian I (Tujuan / Kebutuhan Pengajuan) <span class="text-red-500">*</span>
+                                Uraian I (Tujuan / Kebutuhan Pengajuan) <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="uraian1" required placeholder="Contoh: Pembelian Peralatan & Penyetakan ID Card Santri Banat" class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-medium transition outline-none">
                         </div>
@@ -219,13 +203,13 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    9. Uraian II (Objek / List Item) <span class="text-red-500">*</span>
+                                    Uraian II (Objek / List Item) <span class="text-red-500">*</span>
                                 </label>
-                                <textarea id="uraian2" rows="4" required placeholder="1. Kabel Eterna Rp 65.000&#10;2. Cetak ID Card Rp 275.425" class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-medium transition outline-none"></textarea>
+                                <textarea id="uraian2" rows="4" required placeholder="1. Kabel Eterna Rp 65.000&#10;Cetak ID Card Rp 275.425" class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-medium transition outline-none"></textarea>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    10. Uraian III (Spesifikasi / Rinci)
+                                    Uraian III (Spesifikasi / Rinci)
                                 </label>
                                 <textarea id="uraian3" rows="4" placeholder="Spesifikasi lebih rinci atau keterangan tambahan..." class="w-full border border-slate-200 rounded-2xl p-3.5 bg-slate-50/70 focus:bg-white focus:border-indigo-600 text-sm font-medium transition outline-none"></textarea>
                             </div>
@@ -243,7 +227,7 @@
                             <!-- Kolom 11: Kepada (Dropdown Trigger Autofill) -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    11. Kepada (Pilih Nama Penerima) <span class="text-red-500">*</span>
+                                    Kepada (Pilih Nama Penerima) <span class="text-red-500">*</span>
                                 </label>
                                 <select id="kepada" onchange="autofillPenerima()" required class="w-full border border-indigo-200 rounded-2xl p-3.5 bg-white text-sm font-bold text-indigo-950 focus:border-indigo-600 transition outline-none shadow-sm">
                                     <option value="">-- Pilih Nama Penerima Pembayaran --</option>
@@ -266,19 +250,19 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-3 pt-1">
                                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">12. Sebagai / Jabatan</span>
+                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">Sebagai / Jabatan</span>
                                         <input type="text" id="sebagai" readonly placeholder="-" class="w-full bg-transparent text-xs font-extrabold text-slate-800 outline-none mt-0.5">
                                     </div>
                                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">13. A/N Penerima</span>
+                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">A/N Penerima</span>
                                         <input type="text" id="anPenerima" readonly placeholder="-" class="w-full bg-transparent text-xs font-extrabold text-slate-800 outline-none mt-0.5">
                                     </div>
                                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">14. Bank</span>
+                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">Bank</span>
                                         <input type="text" id="bank" readonly placeholder="-" class="w-full bg-transparent text-xs font-extrabold text-indigo-700 outline-none mt-0.5">
                                     </div>
                                     <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">15. No. Rekening</span>
+                                        <span class="block text-[10px] font-semibold text-slate-400 uppercase">No. Rekening</span>
                                         <input type="text" id="noRekening" readonly placeholder="-" class="w-full bg-transparent text-xs font-mono-code font-extrabold text-slate-800 outline-none mt-0.5">
                                     </div>
                                 </div>
@@ -287,7 +271,7 @@
                             <!-- Kolom 16: Nominal Rupiah -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-                                    16. Nominal Pembayaran (Rupiah) <span class="text-red-500">*</span>
+                                    Nominal Pembayaran (Rupiah) <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
                                     <span class="absolute left-4 top-3.5 text-slate-400 font-extrabold text-sm">Rp</span>
@@ -298,7 +282,7 @@
                             <!-- Kolom 17: Option-Button Lampiran + Upload File/Gambar -->
                             <div class="space-y-3">
                                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider">
-                                    17. Lampiran Pengajuan <span class="text-red-500">*</span>
+                                    Lampiran Pengajuan <span class="text-red-500">*</span>
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
                                     <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-indigo-500 transition">
@@ -374,7 +358,6 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-lg font-extrabold text-slate-900">Daftar & Kelola Data Permintaan Pembayaran (`Data PP`)</h2>
-                        <p class="text-xs text-slate-500">Kelola Kolom 18 s.d 23 (Tanggal Entry, Status, Tanggal TF, Jumlah TF, Tanggal Rekap, Keterangan) & Cetak Form PP per baris.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
                         <div class="relative flex-1 md:w-64">
@@ -398,14 +381,14 @@
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
                             <tr class="bg-slate-900 text-white uppercase tracking-wider text-[11px]">
-                                <th class="p-3.5 font-bold">1. No</th>
-                                <th class="p-3.5 font-bold">3. Nomor PP</th>
-                                <th class="p-3.5 font-bold">4. Pembuat & Tgl</th>
-                                <th class="p-3.5 font-bold">8. Uraian I (Tujuan)</th>
-                                <th class="p-3.5 font-bold">11. Kepada & Rekening</th>
-                                <th class="p-3.5 font-bold text-right">16. Nominal</th>
-                                <th class="p-3.5 font-bold text-center">19. Status</th>
-                                <th class="p-3.5 font-bold">20-23. Info Finance (TF)</th>
+                                <th class="p-3.5 font-bold">No</th>
+                                <th class="p-3.5 font-bold">Nomor PP</th>
+                                <th class="p-3.5 font-bold">Pembuat &amp; Tgl</th>
+                                <th class="p-3.5 font-bold">Uraian I (Tujuan)</th>
+                                <th class="p-3.5 font-bold">Kepada &amp; Rekening</th>
+                                <th class="p-3.5 font-bold text-right">Nominal</th>
+                                <th class="p-3.5 font-bold text-center">Status</th>
+                                <th class="p-3.5 font-bold">Info Finance (TF)</th>
                                 <th class="p-3.5 font-bold text-center">Aksi (Cetak / Edit / Hapus)</th>
                             </tr>
                         </thead>
@@ -423,7 +406,6 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h2 class="text-lg font-extrabold text-slate-900">Kelola Vendor / Penerima</h2>
-                        <p class="text-xs text-slate-500">Data vendor tersimpan di sheet <strong>Vendor</strong> dengan format kolom <strong>NO, PENERIMA, SEBAGAI, A/N PENERIMA, BANK, NOMOR REKENING</strong>.</p>
                     </div>
                     <button onclick="resetVendorForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl text-xs font-extrabold transition">
                         <i class="fa-solid fa-rotate-left mr-1"></i>Reset Form
@@ -879,40 +861,58 @@ function doGet(e) {
             }
         }
 
+        // Isi dropdown penerima dari data vendor yang sudah dimuat.
+        // Pengambilan data terpusat di syncVendorList() agar tidak ada dua request bersamaan.
         async function loadVendorOptions() {
-            const select = document.getElementById('kepada');
-            if (!select) return;
-
             DB_PENERIMA = {};
-            const fallback = [
-                { nama: 'Ustadz Afghani', sebagai: 'Kabag Media', anPenerima: 'AFGHANI', bank: 'BSI', noRekening: '7147151588' },
-                { nama: 'Salwa Nurshalihah', sebagai: 'Staff Media Development', anPenerima: 'SALWA NURSHALIHAH', bank: 'BSI', noRekening: '7218899001' },
-                { nama: 'Dr. Ahmad Fauzi, M.Pd.', sebagai: 'Kaprodi MPI', anPenerima: 'AHMAD FAUZI', bank: 'Bank Mandiri', noRekening: '1370098765432' },
-                { nama: 'Budi Santoso, S.Kom.', sebagai: 'Kepala Divisi IT', anPenerima: 'BUDI SANTOSO', bank: 'BCA', noRekening: '8420991122' },
-                { nama: 'Siti Aminah, M.E.', sebagai: 'Kepala BAAU', anPenerima: 'SITI AMINAH', bank: 'BRI', noRekening: '002901002345501' },
-                { nama: 'Toko Berkah Jaya', sebagai: 'Vendor Peralatan & Percetakan', anPenerima: 'CV BERKAH JAYA UTAMA', bank: 'BCA', noRekening: '4561122334' }
-            ];
+            (vendorList || []).forEach(v => {
+                if (v && v.nama) DB_PENERIMA[v.nama] = v;
+            });
+            renderVendorOptions((vendorList || []).map(v => ({
+                nama: v.nama,
+                sebagai: v.sebagai
+            })));
+        }
 
-            try {
-                if (SCRIPT_URL && SCRIPT_URL.startsWith('https://script.google.com')) {
-                    const res = await fetch(`${SCRIPT_URL}?action=getVendors`);
-                    const vendors = await res.json();
-                    if (Array.isArray(vendors) && vendors.length > 0) {
-                        vendors.forEach(v => {
-                            DB_PENERIMA[v.nama] = v;
-                        });
-                        renderVendorOptions(vendors.map(v => ({ nama: v.nama, sebagai: v.sebagai })));
+        // JSONP dipakai untuk GET Apps Script agar tidak bergantung pada izin CORS browser.
+        function getVendorsJsonp(timeoutMs = 12000) {
+            return new Promise((resolve, reject) => {
+                const callbackName = '__financeVendorCallback_' +
+                    Date.now() + '_' + Math.floor(Math.random() * 100000);
+                const script = document.createElement('script');
+                let finished = false;
+
+                const cleanup = () => {
+                    if (finished) return;
+                    finished = true;
+                    clearTimeout(timer);
+                    script.remove();
+                    try { delete window[callbackName]; }
+                    catch (_) { window[callbackName] = undefined; }
+                };
+
+                const timer = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Waktu tunggu data vendor habis.'));
+                }, timeoutMs);
+
+                window[callbackName] = data => {
+                    cleanup();
+                    if (!Array.isArray(data)) {
+                        reject(new Error('Format respons getVendors bukan array.'));
                         return;
                     }
-                }
-            } catch (e) {
-                console.warn('Gagal memuat vendor dari sheet, memakai data lokal fallback.', e);
-            }
+                    resolve(data);
+                };
 
-            fallback.forEach(v => {
-                DB_PENERIMA[v.nama] = v;
+                script.onerror = () => {
+                    cleanup();
+                    reject(new Error('Tidak dapat mengakses endpoint vendor Apps Script.'));
+                };
+
+                script.src = `${SCRIPT_URL}?action=getVendors&prefix=${callbackName}&_=${Date.now()}`;
+                document.head.appendChild(script);
             });
-            renderVendorOptions(fallback.map(v => ({ nama: v.nama, sebagai: v.sebagai })));
         }
 
         let vendorList = [];
@@ -1097,6 +1097,7 @@ function doGet(e) {
 
         function openVendorTab() {
             switchTab('vendor');
+            syncVendorList();
         }
 
         // Navigasi Tab
@@ -1141,6 +1142,18 @@ function doGet(e) {
         });
 
         // Submit Form Input PP Baru
+        function toggleNamaPembuatCustom() {
+            const select = document.getElementById('namaPembuat');
+            const customInput = document.getElementById('namaPembuatCustom');
+            const isCustom = select.value === '__custom__';
+
+            customInput.classList.toggle('hidden', !isCustom);
+            customInput.required = isCustom;
+
+            if (!isCustom) customInput.value = '';
+            else customInput.focus();
+        }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSubmitPP');
@@ -1170,7 +1183,9 @@ function doGet(e) {
                 nomor: nomorBaru,
                 divisi: document.getElementById('divisi').value,
                 nomorPp: nomorPpBaru,
-                namaPembuat: document.getElementById('namaPembuat').value,
+                namaPembuat: document.getElementById('namaPembuat').value === '__custom__'
+                    ? document.getElementById('namaPembuatCustom').value.trim()
+                    : document.getElementById('namaPembuat').value,
                 tanggalPp: document.getElementById('tanggalPp').value,
                 tanggalPemenuhan: document.getElementById('tanggalPemenuhan').value,
                 tujuan: document.getElementById('tujuan').value,
@@ -1212,6 +1227,7 @@ function doGet(e) {
 
             // Reset Form & Tampilkan Print Preview Data Terbaru secara Otomatis
             document.getElementById('formInputPP').reset();
+            toggleNamaPembuatCustom();
             initDefaultDates();
             updateLiveNomorPP();
             renderTable();
@@ -1678,29 +1694,28 @@ function doGet(e) {
         }
 
         async function syncVendorList() {
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=getVendors`);
-                const text = await res.text();
-                let list = [];
-                try {
-                    list = JSON.parse(text);
-                } catch (parseErr) {
-                    console.warn('Respons vendor bukan JSON valid:', parseErr);
-                    list = [];
-                }
-                vendorList = Array.isArray(list) ? list : [];
-            } catch (e) {
-                console.warn('Gagal mengambil vendor dari Apps Script, memakai fallback lokal.', e);
-                vendorList = [
-                    { nama: 'Ustadz Afghani', sebagai: 'Kabag Media', anPenerima: 'AFGHANI', bank: 'BSI', noRekening: '7147151588' },
-                    { nama: 'Salwa Nurshalihah', sebagai: 'Staff Media Development', anPenerima: 'SALWA NURSHALIHAH', bank: 'BSI', noRekening: '7218899001' },
-                    { nama: 'Dr. Ahmad Fauzi, M.Pd.', sebagai: 'Kaprodi MPI', anPenerima: 'AHMAD FAUZI', bank: 'Bank Mandiri', noRekening: '1370098765432' },
-                    { nama: 'Budi Santoso, S.Kom.', sebagai: 'Kepala Divisi IT', anPenerima: 'BUDI SANTOSO', bank: 'BCA', noRekening: '8420991122' },
-                    { nama: 'Siti Aminah, M.E.', sebagai: 'Kepala BAAU', anPenerima: 'SITI AMINAH', bank: 'BRI', noRekening: '002901002345501' },
-                    { nama: 'Toko Berkah Jaya', sebagai: 'Vendor Peralatan & Percetakan', anPenerima: 'CV BERKAH JAYA UTAMA', bank: 'BCA', noRekening: '4561122334' }
-                ];
+            const tbody = document.getElementById('vendorTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">Menghubungkan ke Google Sheet Vendor...</td></tr>';
             }
-            renderVendorTable();
+
+            try {
+                const list = await getVendorsJsonp();
+                vendorList = list.filter(v => v && String(v.nama || '').trim() !== '');
+                await loadVendorOptions();
+                renderVendorTable();
+
+                if (tbody && vendorList.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">Sheet Vendor berhasil dibaca, tetapi belum ada data vendor.</td></tr>';
+                }
+            } catch (e) {
+                console.error('Sinkronisasi vendor gagal:', e);
+                renderVendorTable();
+                if (tbody && (!vendorList || vendorList.length === 0)) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-rose-500 font-semibold">Gagal memuat vendor: ${String(e.message || e)}</td></tr>`;
+                }
+                showToast('Gagal memuat vendor dari Google Sheet. Periksa URL/deployment Apps Script.', true);
+            }
         }
 
         function showToast(msg, isError = false) {
@@ -1723,7 +1738,6 @@ function doGet(e) {
         window.onload = function() {
             initDefaultDates();
             updateLiveNomorPP();
-            loadVendorOptions();
             syncVendorList();
             renderTable();
             syncFromGoogleSheets();

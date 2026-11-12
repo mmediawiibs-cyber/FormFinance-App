@@ -857,7 +857,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm">
+                    <button onclick="cetakPrintPreview()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm">
                         <i class="fa-solid fa-print"></i><span>Cetak Browser</span>
                     </button>
                     <button onclick="bukaPdfSheetAsli()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm">
@@ -967,6 +967,7 @@
     <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
         let SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1oqTHXqXFr8qoYtnAgU6rwF5jVLWvY8Xfj7mIR-yJNQtnqwQPMZLzlR13j1IUrMU/exec";
+        const FINANCE_PAGE_TITLE_DEFAULT = document.title;
 
         let DB_PENERIMA = {};
         let vendorList = [];
@@ -1855,6 +1856,36 @@
         }
 
         // ============================================================
+        // ============================================================
+        // NAMA FILE CETAK OTOMATIS DARI NOMOR SURAT
+        // Contoh: "001 / PP.STIT.MD / XI / 2026"
+        // menjadi: "001.PP.STIT.MD.XI.2026"
+        // ============================================================
+        function getSafePrintFileName() {
+            const nomorDokumen = document.getElementById('p_nomorDok')?.innerText || '';
+            const safeName = String(nomorDokumen)
+                .trim()
+                .replace(/\s*\/\s*/g, '.')
+                .replace(/[\\:*?"<>|]/g, '.')
+                .replace(/\s+/g, ' ')
+                .replace(/\.+/g, '.')
+                .replace(/^\.+|\.+$/g, '');
+            return safeName || 'Finance_STIT';
+        }
+
+        function cetakPrintPreview() {
+            const namaFile = getSafePrintFileName();
+            document.title = namaFile;
+
+            const pulihkanJudul = function () {
+                document.title = FINANCE_PAGE_TITLE_DEFAULT;
+            };
+            window.addEventListener('afterprint', pulihkanJudul, { once: true });
+
+            // Browser mengambil document.title sebagai nama awal saat Save as PDF.
+            window.print();
+        }
+
         // PRINT PREVIEW & BUKA PDF SHEET ASLI (FORM PP, PUM, PJUM)
         // ============================================================
         function openPrintPreview(mode, nomor) {
@@ -1960,6 +1991,7 @@
 
         function closePrintModal() {
             document.getElementById('modalPrintPreview').classList.add('hidden');
+            document.title = FINANCE_PAGE_TITLE_DEFAULT;
         }
 
         function bukaPdfSheetAsli() {
